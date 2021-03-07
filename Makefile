@@ -1,4 +1,4 @@
-CC= aarch64-linux-gnu-gcc
+CC= aarch64-linux-gnu
 CXXFLAGS = -Iinclude -Wall -ffreestanding  -nostdlib -nostartfiles
 
 LD = aarch64-linux-gnu-ld
@@ -12,7 +12,8 @@ GDBFLAGS = -x
 
 BUILD_DIR = build
 ELF = kernel.elf
-SRC = $(wildcard **/*.S) $(wildcard **/*.cc)
+#SRC = $(wildcard **/*.S) $(wildcard **/*.c)
+SRC = $(wildcard **/*.S) $(wildcard **/*.c)
 IMG = kernel8.img
 OBJ = boot.o $(filter-out boot.o $(wildcard *.o))
 LINKER_SCRIPTS = $(wildcard **/*.ld)
