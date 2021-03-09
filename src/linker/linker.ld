@@ -1,4 +1,3 @@
-ENTRY(__kernel_loader)
 
 SECTIONS {
     . = 0x80000;

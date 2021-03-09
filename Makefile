@@ -12,8 +12,7 @@ GDBFLAGS = -x
 
 BUILD_DIR = build
 ELF = kernel.elf
-#SRC = $(wildcard **/*.S) $(wildcard **/*.c)
-SRC = $(wildcard **/*.S) $(wildcard **/*.c)
+SRC = $(wildcard src/**/*.S) $(wildcard src/**/*.c)
 IMG = kernel8.img
 OBJ = boot.o $(filter-out boot.o $(wildcard *.o))
 LINKER_SCRIPTS = $(wildcard **/*.ld)

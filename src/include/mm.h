@@ -10,6 +10,10 @@
 
 #define LOW_MEMORY (2 * SECTION_SIZE)
 
+#ifndef __ASSEMBLER__
+
 void memzero(unsigned long src, unsigned long n);
+
+#endif
 
 #endif
