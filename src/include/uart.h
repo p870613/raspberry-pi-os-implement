@@ -17,7 +17,8 @@
 
 void uart_init(void);
 void uart_send(char);
-void uart_write(char *);
+void uart_put(char *);
 char uart_recv(void);
+void uart_get(char*);
 
 #endif

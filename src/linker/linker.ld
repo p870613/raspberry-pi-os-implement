@@ -2,9 +2,10 @@
 SECTIONS {
     . = 0x80000;
 
-    .text : { *(.text) }
-    .data : { *(.data) }
-    .bss : 
+    .text ALIGN(0x10) : { *(.text) }
+    .data ALIGN(0x10) : { *(.data) }
+
+    .bss ALIGN(0x10) : 
     {
         _bss_start = .;
         *(.bss)

@@ -1,10 +1,15 @@
 #include "uart.h"
+#include "shell.h"
 
 void kernel_main(void){
     uart_init();
-    uart_write("hello world \r\n");
-
-    while (1)
-        uart_send(uart_recv());
+    uart_put("hello world \r\n");
+    
+    shell();
+    /*while (1){*/
+        /*char input[100];*/
+        /*uart_get(input);*/
+        /*uart_put(input);*/
+    /*}*/
 } 
 

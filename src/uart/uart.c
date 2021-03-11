@@ -1,5 +1,6 @@
 #include "uart.h"
 #include "gpio.h"
+
 void uart_send(char c) {
     while(1) {
         if((*AUX_MU_LSR_REG) & 0X20)
@@ -8,9 +9,28 @@ void uart_send(char c) {
     *AUX_MU_IO_REG = c;
 }
 
-void uart_write(char* str) {
-    for(int i = 0; str[i] != '\0'; i++)
+void uart_put(char* str) {
+    for(int i = 0; str[i] != '\0'; i++){
+        if(str[i] == '\n'){
+            uart_send('\r');
+        }
         uart_send(str[i]);
+    }
+}
+
+void uart_get(char *ret){
+    int index = 0;
+    while(1){
+        char input = uart_recv();
+        uart_send(input);
+        if(input == '\n' || input == '\r'){
+            ret[index] = '\0';
+            break;
+        }
+
+        ret[index] = input;
+        index ++;
+    }
 }
 
 char uart_recv(void) {
@@ -18,14 +38,15 @@ char uart_recv(void) {
 		if((*AUX_MU_LSR_REG) & 0x01)
 			break;
 	}
-	return((*AUX_MU_IO_REG) & 0xFF);
+	char ret = ((*AUX_MU_IO_REG) & 0xFF);
+    return ret == '\r' ? '\n' : ret;
 }
 
 void delay(unsigned int n){
     while(n --)
         asm volatile("nop");
-    return;
 }
+
 void uart_init(void){
     unsigned int selector = *GPFSEL1;
 
