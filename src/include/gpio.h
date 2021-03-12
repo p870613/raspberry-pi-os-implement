@@ -8,4 +8,8 @@
 #define GPPUD           (volatile unsigned int*)(PBASE+0x00200094)
 #define GPPUDCLK0       (volatile unsigned int*)(PBASE+0x00200098)
 
+#define PM_PASSWORD 0x5a000000
+#define PM_RSTC ((volatile unsigned int*)(PBASE + 0x10001c))
+#define PM_WDOG ((volatile unsigned int*)(PBASE + 0x00100024))
+
 #endif

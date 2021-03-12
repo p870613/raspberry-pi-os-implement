@@ -18,11 +18,31 @@ void uart_put(char* str) {
     }
 }
 
+
+void uart_get_cmd(char *ret){
+    int index = 0;
+    while(1){
+        char input = uart_recv();
+
+        if(input == '\n'){
+            uart_send('\r');
+        }
+        
+        uart_send(input);
+
+        if(input == '\n' || input == '\r'){
+            ret[index] = '\0';
+            break;
+        }
+
+        ret[index] = input;
+        index ++;
+    }
+}
 void uart_get(char *ret){
     int index = 0;
     while(1){
         char input = uart_recv();
-        uart_send(input);
         if(input == '\n' || input == '\r'){
             ret[index] = '\0';
             break;

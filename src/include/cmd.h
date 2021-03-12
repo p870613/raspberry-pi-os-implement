@@ -3,9 +3,9 @@
 
 #include "uart.h"
 
-void help(void);
+void help(char*);
 void hello(char*);
-void reboot(void);
-void error_cmd(void);
-
+void reboot(char*);
+void error_cmd(char*);
+void nop(char*);
 #endif
