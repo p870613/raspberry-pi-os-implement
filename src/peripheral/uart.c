@@ -1,5 +1,4 @@
-#include "uart.h"
-#include "gpio.h"
+#include "peripheral/uart.h"
 
 void uart_send(char c) {
     while(1) {

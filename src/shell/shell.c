@@ -1,6 +1,4 @@
 #include "shell.h"
-#include "uart.h"
-#include "cmd.h"
 #include <string.h>
 
 void parse(char* input, char* cmdline, char* arg){

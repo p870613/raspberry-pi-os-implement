@@ -1,7 +1,8 @@
 #ifndef _CMD_H
 #define _CMD_H
 
-#include "uart.h"
+#include <peripheral/uart.h>
+#include <gpio.h>
 
 void help(char*);
 void hello(char*);

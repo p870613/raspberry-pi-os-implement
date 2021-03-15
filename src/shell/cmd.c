@@ -1,6 +1,5 @@
 #include "cmd.h"
-#include <uart.h>
-#include <gpio.h>
+
 void help(char* arg) {
     uart_put("help: print all available commands\n");
     uart_put("hello: print Hello World!\n");

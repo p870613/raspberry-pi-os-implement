@@ -47,3 +47,4 @@ gdb:
 
 clean:
 	rm -rf build
+	rm -rf *.o
