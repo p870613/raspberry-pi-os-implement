@@ -7,7 +7,8 @@ void kernel_main(void){
     uart_init();
     uart_put("********** hello world ***********\n");
     uart_put("Board Revision: ");
-    uart_put(get_board_revision());
+
+    uart_hex(get_board_revision());
     uart_put("\n");
 
     shell();

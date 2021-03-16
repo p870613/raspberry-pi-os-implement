@@ -21,5 +21,6 @@ void uart_put(char *);
 char uart_recv(void);
 void uart_get(char*);
 void uart_get_cmd(char*);
+void uart_hex(unsigned int);
 
 #endif

@@ -38,6 +38,7 @@ void uart_get_cmd(char *ret){
         index ++;
     }
 }
+
 void uart_get(char *ret){
     int index = 0;
     while(1){
@@ -50,6 +51,29 @@ void uart_get(char *ret){
         ret[index] = input;
         index ++;
     }
+}
+
+/*void uart_hex(unsigned int d) {*/
+  /*unsigned int n;*/
+  /*int c;*/
+  /*for (c = 28; c >= 0; c -= 4)*/
+    /*{*/
+       /*get highest tetrad*/
+      /*n = (d >> c) & 0xF;*/
+       /*0-9 => '0'-'9', 10-15 => 'A'-'F'*/
+      /*n += n > 9 ? 0x37 : 0x30;*/
+      /*uart_send (n);*/
+    /*}*/
+/*}*/
+void uart_hex(unsigned int d){
+    unsigned int n;
+    
+    for(int i = 28; i >= 0; i -= 4){
+        n = (d >> i) & 0xf;
+        n += n > 9 ? 0x37 : 0x30;
+        uart_send(n);
+    }
+
 }
 
 char uart_recv(void) {
