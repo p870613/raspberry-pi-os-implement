@@ -15,7 +15,7 @@ unsigned int get_board_revision(){
 } 
 
 void  mailbox_call(unsigned char channel) {
-    unsigned int addr = (((unsigned int)&mailbox) & ~0xf) | (channel & 0xf);
+    unsigned int addr = (((unsigned int)&mailbox) & (unsigned int)(~0xf)) | (channel & 0xf);
 
     while(*MAILBOX_STATUS & MAILBOX_FULL);
 

@@ -38,7 +38,7 @@
 #define MAILBOX_RESPONSE 0x80000000
 
 //buffer
-volatile uint32_t __attribute__ ((aligned (16))) mailbox[36];
+volatile unsigned int __attribute__ ((aligned (16))) mailbox[36];
 
 unsigned int get_board_revision();
 void mailbox_call(unsigned char);
