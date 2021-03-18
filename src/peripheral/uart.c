@@ -17,6 +17,29 @@ void uart_put(char* str) {
     }
 }
 
+void uart_int(int n){
+    char output[100];
+    int index = 0, flag = 0;
+
+    if(n < 0){
+        n = -n;
+        flag = 1;
+    }else if(n == 0){
+        uart_put("0");
+        return ;
+    }
+
+    while(n > 0){
+        output[index++] = (n % 10) + '0';
+        n = n / 10;
+    }
+    if(flag == 1)
+        output[index ++] = '-';
+    output[index] = '\0';
+
+    for(int i = index - 1; i >= 0; i--)
+        uart_send(output[i]);
+}
 
 void uart_get_cmd(char *ret){
     int index = 0;
@@ -81,7 +104,6 @@ void uart_hex(unsigned int d){
         n += n > 9 ? 0x37 : 0x30;
         uart_send(n);
     }
-
 }
 
 char uart_recv(void) {
