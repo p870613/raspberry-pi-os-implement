@@ -22,20 +22,28 @@ void uart_get_cmd(char *ret){
     int index = 0;
     while(1){
         char input = uart_recv();
-
-        if(input == '\n'){
-            uart_send('\r');
-        }
         
-        uart_send(input);
-
         if(input == '\n' || input == '\r'){
             ret[index] = '\0';
+            uart_send('\r');
+            uart_send('\n');
             break;
         }
 
-        ret[index] = input;
-        index ++;
+        if((input == 127 || input == 8) && index <= 0)
+            continue;
+        //backspace or delete
+        if((input == 127 || input == 8) && index > 0){
+            uart_send('\b');
+            uart_send(' ');
+            uart_send('\b');
+            ret[index--] = '\0';
+        }else {
+            uart_send(input);
+    
+            ret[index] = input;
+            index ++;
+        }
     }
 }
 
