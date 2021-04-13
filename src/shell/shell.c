@@ -25,6 +25,8 @@ void* cmd_state_machine(char* cmdline){
         return &hello;
     else if(!strcmp(cmdline, "reboot"))
         return &reboot;
+    else if(!strcmp(cmdline, "loadimg"))
+        return &loadimg;
     else if(!strcmp(cmdline, "\n") || !strcmp(cmdline, "") || !strcmp(cmdline, " "))
         return &nop;
     else   

@@ -1,4 +1,3 @@
-
 SECTIONS {
     . = 0x80000;
 
@@ -11,5 +10,12 @@ SECTIONS {
         *(.bss);
         *(COMMON);
         _bss_end = .;
+    }
+
+    .bootloader ALIGN(0X10) : 
+    {
+        _bootloader_start = .;
+        *(.bootloader);
+        _bootloader_end = .;
     }
 }

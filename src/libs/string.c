@@ -79,3 +79,71 @@ char* strcat(char* dest, const char* src) {
   *cur = '\0';
   return dest;
 }
+
+long strtol(const char * start_ptr, const char **__restrict endptr, int base) {
+    int neg_flag = 0;
+    unsigned long acc = 0;
+    
+    const char* ptr = start_ptr;
+
+    int index = 0;
+    while(1) {
+        if(index >= strlen(start_ptr) || *ptr != ' ')
+            break;
+        index ++;
+        ptr ++;
+    }
+
+    if(*ptr == '-') {
+        neg_flag = 1;
+        ptr ++;
+    }else if(*ptr == '+') {
+        ptr ++;
+    }
+    
+    if((base == 0 || base == 16) &&
+       (*ptr == '0') && 
+       (*(ptr + 1) == 'x' || *(ptr + 1) == 'X') &&
+       ((*(ptr + 2) >= '0' && *(ptr + 2) <= '9') || 
+        (*(ptr + 2) >= 'a' && *(ptr + 2) <= 'f') || 
+        (*(ptr + 2) >= 'A' && *(ptr + 2) <= 'F')))
+       {
+            base = 16;
+            ptr = ptr + 2;
+       }
+
+    if(base == 0)
+        base = 10;
+
+    if(base < 2 || base > 36)
+        return 0;
+
+    int unsigned_long_size = sizeof(acc) * 8 - 1;
+    unsigned long overflow = (neg_flag == 1) ? (1 << unsigned_long_size) - 1 : (1 << unsigned_long_size);
+
+    char c = 0;
+    while(1) {
+        if(*ptr >= '0' && *ptr <= '9'){
+            c = *ptr - '0';
+        }else if(*ptr >= 'a' && *ptr <= 'z'){
+            c = *ptr - 'a';
+        }else if(*ptr >= 'A' && *ptr <= 'Z'){
+            c = *ptr - 'A';
+        }else 
+            break;
+
+        if(c >= base)
+            break;
+
+        if(acc >= overflow)
+            return 0;
+        
+        acc = acc * base + c;
+        ptr ++;
+    }
+
+    if(endptr != 0)
+        *endptr = ptr - 1;
+
+    return (neg_flag == 1) ? -acc : acc;
+}

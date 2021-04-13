@@ -55,6 +55,7 @@ void uart_get_cmd(char *ret){
 
         if((input == 127 || input == 8) && index <= 0)
             continue;
+
         //backspace or delete
         if((input == 127 || input == 8) && index > 0){
             uart_send('\b');
@@ -84,6 +85,11 @@ void uart_get(char *ret){
     }
 }
 
+void uart_nget(char* buf, int n) {
+    for(int i = 0; i < n; i++){
+        buf[i] = uart_recv();
+    }
+}
 /*void uart_hex(unsigned int d) {*/
   /*unsigned int n;*/
   /*int c;*/
@@ -141,5 +147,7 @@ void uart_init(void){
     *AUX_MU_LCR_REG = 3;                //Enable 8 bit mode
     *AUX_MU_MCR_REG = 0;                //Set RTS line to be always high
     *AUX_MU_BAUD_REG = 270;             //Set baud rate to 115200
+    *AUX_MU_IIR_REG = 6;                // NO FIFO
     *AUX_MU_CNTL_REG = 3;               //Finally, enable transmitter and receiver
+
 }
