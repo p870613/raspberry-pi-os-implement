@@ -22,9 +22,9 @@ void error_cmd(char* arg){
 }
 
 void loadimg(char* arg){
-    /*extern void *_bootloader_end, *_bootloader_start;*/
+    extern void *_bootloader_end, *_bootloader_start;
     size_t load_address, img_size;
-    /*size_t bootloader_size = (size_t)&_bootloader_end - (size_t)&_bootloader_start;*/
+    size_t bootloader_size = (size_t)&_bootloader_end - (size_t)&_bootloader_start;
     char buf[9];
 
     /*read load address*/
@@ -32,8 +32,6 @@ void loadimg(char* arg){
     uart_nget(buf, 8);
     buf[8] = '\0';
     load_address = strtol(buf, 0, 16);
-    /*char *tmp = "0x60000";*/
-    /*load_address = strtol(tmp, 0, 16);*/
     uart_put("\nLoad image at: 0x");    
     uart_hex(load_address);
 
@@ -43,14 +41,22 @@ void loadimg(char* arg){
     buf[8] = '\0';
     uart_put(buf);
     img_size = strtol(buf, 0, 16);
-    /*img_size = 6344;*/
     uart_put("\nimage size: ");
     uart_hex(img_size);
     uart_put("\n");
     uart_int(img_size);
     uart_put("\n");
     
-     /*jump to loading img*/
+    size_t relocate_img_jump = (size_t)&img_jump;
+     
+    if((load_address + img_size) > (size_t)&_bootloader_start) {
+        uart_put("123");
+        size_t relocated_bootloader = load_address + img_size + 0x1000;
+        memcpy((char*) relocated_bootloader, &_bootloader_start, bootloader_size);
+        relocate_img_jump = relocated_bootloader + ((size_t)img_jump - (size_t)&_bootloader_start);
+    }
+
+    /*jump to loading img*/
     asm volatile("mov x0, %0\n" 
                  "mov x1, %1\n"
                  "mov sp, %2\n"
@@ -58,10 +64,11 @@ void loadimg(char* arg){
                  "r"(load_address), 
                  "r"(img_size),
                  "r"(load_address),
-                 "r"(img_jump):"x0", "x1");
+                 "r"(relocate_img_jump):"x0", "x1");
 }
 
 void img_jump(size_t load_address, size_t img_size){
+    //get image 
     uart_nget((char*) load_address, img_size);
     
     asm volatile("mov sp, %0\n"

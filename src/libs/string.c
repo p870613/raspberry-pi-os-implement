@@ -121,14 +121,14 @@ long strtol(const char * start_ptr, const char **__restrict endptr, int base) {
     int unsigned_long_size = sizeof(acc) * 8 - 1;
     unsigned long overflow = (neg_flag == 1) ? (1 << unsigned_long_size) - 1 : (1 << unsigned_long_size);
 
-    char c = 0;
+    int c = 0;
     while(1) {
         if(*ptr >= '0' && *ptr <= '9'){
             c = *ptr - '0';
         }else if(*ptr >= 'a' && *ptr <= 'z'){
-            c = *ptr - 'a';
+            c = *ptr - 'a' + 10;
         }else if(*ptr >= 'A' && *ptr <= 'Z'){
-            c = *ptr - 'A';
+            c = *ptr - 'A' + 10;
         }else 
             break;
 
@@ -139,6 +139,9 @@ long strtol(const char * start_ptr, const char **__restrict endptr, int base) {
             return 0;
         
         acc = acc * base + c;
+        uart_int(c);
+        uart_put("\n");
+        
         ptr ++;
     }
 
