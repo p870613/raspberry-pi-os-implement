@@ -12,6 +12,6 @@ void error_cmd(char*);
 void nop(char*);
 void loadimg(char*);
 
+__attribute__((__section__(".bootloader"))) void bootloader_get(char*, int);
 __attribute__((__section__(".bootloader"))) void img_jump(size_t, size_t);
-
 #endif

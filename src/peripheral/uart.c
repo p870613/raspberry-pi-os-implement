@@ -17,6 +17,15 @@ void uart_put(char* str) {
     }
 }
 
+void uart_nput(char* str, int n){
+    for(int i = 0; i < n; i++){
+        if(str[i] == '\n'){
+            uart_send('\r');
+        }
+        uart_send(str[i]);
+    }
+}
+
 void uart_int(int n){
     char output[100];
     int index = 0, flag = 0;

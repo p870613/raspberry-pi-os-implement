@@ -24,7 +24,7 @@ void error_cmd(char* arg){
 void loadimg(char* arg){
     extern void *_bootloader_end, *_bootloader_start;
     size_t load_address, img_size;
-    size_t bootloader_size = (size_t)&_bootloader_end - (size_t)&_bootloader_start;
+    /*size_t bootloader_size = (size_t)&_bootloader_end - (size_t)&_bootloader_start;*/
     char buf[9];
 
     /*read load address*/
@@ -48,15 +48,19 @@ void loadimg(char* arg){
     uart_put("\n");
     
     size_t relocate_img_jump = (size_t)&img_jump;
-     
-    if((load_address + img_size) > (size_t)&_bootloader_start) {
-        uart_put("123");
-        size_t relocated_bootloader = load_address + img_size + 0x1000;
-        memcpy((char*) relocated_bootloader, &_bootloader_start, bootloader_size);
-        relocate_img_jump = relocated_bootloader + ((size_t)img_jump - (size_t)&_bootloader_start);
-    }
 
-    /*jump to loading img*/
+    if((load_address + img_size) > (size_t)&_bootloader_start) {
+        char loss[img_size];
+        uart_nget(loss, img_size);
+        uart_put("load address will overlap bootloader \n");
+        uart_put("please input other address \n");
+        return ;
+        /*size_t relocated_bootloader = load_address + img_size + 0x10000;*/
+        /*relocated_bootloader = (relocated_bootloader >> 4) << 4;*/
+        /*memcpy((char*) relocated_bootloader, &_bootloader_start, bootloader_size);*/
+        /*relocate_img_jump = relocated_bootloader + ((size_t)&img_jump - (size_t)&_bootloader_start);*/
+    }
+    
     asm volatile("mov x0, %0\n" 
                  "mov x1, %1\n"
                  "mov sp, %2\n"
@@ -67,9 +71,16 @@ void loadimg(char* arg){
                  "r"(relocate_img_jump):"x0", "x1");
 }
 
+
+void bootloader_get(char* buf, int n) {
+    for(int i = 0; i < n; i++){
+        buf[i] = uart_recv();
+    }
+}
+
 void img_jump(size_t load_address, size_t img_size){
     //get image 
-    uart_nget((char*) load_address, img_size);
+    bootloader_get((char*) load_address, img_size);
     
     asm volatile("mov sp, %0\n"
                  "blr %1\n"::

@@ -139,9 +139,6 @@ long strtol(const char * start_ptr, const char **__restrict endptr, int base) {
             return 0;
         
         acc = acc * base + c;
-        uart_int(c);
-        uart_put("\n");
-        
         ptr ++;
     }
 

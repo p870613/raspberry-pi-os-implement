@@ -14,8 +14,8 @@ SECTIONS {
 
     .bootloader ALIGN(0X10) : 
     {
-        _bootloader_start = .;
+        _bootloader_start = ALIGN(0X10);
         *(.bootloader);
-        _bootloader_end = .;
+        _bootloader_end = ALIGN(0X10);
     }
 }
