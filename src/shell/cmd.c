@@ -1,27 +1,29 @@
 #include "cmd.h"
 
-void help(char* arg) {
+void help(char argc[][100], int argv) {
     uart_put("help: print all available commands\n");
     uart_put("hello: print Hello World!\n");
     uart_put("loadimg\n");
+    uart_put("ls\n");
+    uart_put("cat\n");
     uart_put("reboot");
 }
 
-void hello(char* arg){
+void hello(char argc[][100], int argv){
     uart_put("Hello World!");
-    uart_put(arg);
+    uart_put(argc[0]);
 }
 
-void reboot(char *arg){
+void reboot(char argc[][100], int argv){
     *PM_RSTC = (PM_PASSWORD | 0x20); // full reset
     *PM_WDOG = (PM_PASSWORD | 100);  // number of watchdog tick
 }
 
-void error_cmd(char* arg){
+void error_cmd(char argc[][100], int argv){
     uart_put("command not found");
 }
 
-void loadimg(char* arg){
+void loadimg(char arg[][100], int argv){
     extern void *_bootloader_end, *_bootloader_start;
     size_t load_address, img_size;
     /*size_t bootloader_size = (size_t)&_bootloader_end - (size_t)&_bootloader_start;*/
@@ -88,4 +90,22 @@ void img_jump(size_t load_address, size_t img_size){
                  "r"(load_address)); 
 }
 
-void nop(char* arg) { return; }
+void nop(char argc[][100], int argv) { return; }
+
+void ls(char argc[][100], int argv){
+   get_all_filename(); 
+}
+
+void cat(char argc[][100], int argv){
+    for(int i = 0; i < header_index; i++) {
+        char buf[500];
+        get_content(header[i].name_address, header[i].name_size, buf);
+        if(!strcmp(argc[0], buf)){
+            get_content(header[i].file_address, header[i].file_size, buf);
+            uart_put(buf);
+            return ;
+        }
+    }
+    uart_put("can't find file ");
+    uart_put(argc[0]);
+}

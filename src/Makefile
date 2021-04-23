@@ -42,6 +42,15 @@ run:
 		-serial null\
 		-serial stdio
 
+
+run-ramdisk:
+	qemu-system-aarch64 -M raspi3\
+		-kernel $(BUILD_DIR)/$(IMG)\
+		-display none\
+		-serial null\
+		-initrd initramfs.cpio\
+		-serial stdio
+
 gdb:
 	$(GDB) $(GDBFLAGS) $(GDBFILE)
 

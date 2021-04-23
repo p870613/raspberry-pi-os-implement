@@ -1,21 +1,29 @@
 #include "shell.h"
 #include <string.h>
 
-void parse(char* input, char* cmdline, char* arg){
-    int flag = 0;
+void parse(char* input, char* cmdline, char argc[][100], int* argv){
+    int flag = 0, arg_flag = 0;
     int cmd_index = 0, arg_index = 0;
     for(int i = 0; input[i] != '\0'; i++){
-        if(input[i] == ' ')
-            flag = 1;
 
-        if(flag == 0){
+        if(flag == 0 && input[i] == ' '){
+            flag = 1;
+            cmdline[cmd_index] = '\0';
+        }else if(flag == 0){
             cmdline[cmd_index ++] = input[i];
-        }else{
-            arg[arg_index ++] = input[i];
+        }else if(flag == 1 && input[i] == ' '){
+            argc[*argv][arg_index] = '\0';
+            (*argv) ++;
+            arg_index = 0;
+        }else if(flag == 1){
+            argc[*argv][arg_index ++] = input[i];
+            arg_flag = 1;
         }
     }
+    if(arg_flag == 1)
+        argc[(*argv)++][arg_index] = '\0';
     cmdline[cmd_index] = '\0';
-    arg[arg_index] = '\0';
+        
 }
 
 void* cmd_state_machine(char* cmdline){
@@ -27,6 +35,10 @@ void* cmd_state_machine(char* cmdline){
         return &reboot;
     else if(!strcmp(cmdline, "loadimg"))
         return &loadimg;
+    else if(!strcmp(cmdline, "ls"))
+        return &ls;
+    else if(!strcmp(cmdline, "cat"))
+        return &cat;
     else if(!strcmp(cmdline, "\n") || !strcmp(cmdline, "") || !strcmp(cmdline, " "))
         return &nop;
     else   
@@ -34,10 +46,11 @@ void* cmd_state_machine(char* cmdline){
 }
 
 void exec_cmd(char *input){
-    char cmdline[100], arg[100];
-    parse(input, cmdline, arg);
-    void (*fun_ptr)(char*) = cmd_state_machine(cmdline);
-    fun_ptr(arg);
+    char cmdline[100], argc[100][100];
+    int argv = 0;
+    parse(input, cmdline, argc, &argv);
+    void (*fun_ptr)(char[][100], int) = cmd_state_machine(cmdline);
+    fun_ptr(argc, argv);
 } 
 
 void shell(){
