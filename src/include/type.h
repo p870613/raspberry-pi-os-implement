@@ -14,5 +14,6 @@
 #define int8_t   char
 
 #define size_t  uint64_t
+#define NULL (void*)0
 
 #endif  // VALKYRIE_TYPES_H_

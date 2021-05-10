@@ -12,7 +12,7 @@ GDBFLAGS = -x
 
 BUILD_DIR = build
 ELF = kernel.elf
-SRC = $(wildcard **/*.S) $(wildcard **/*.c)
+SRC = $(wildcard **/*.S) $(wildcard **/*.c) $(wildcard **/mm/*.c)
 IMG = kernel8.img
 OBJ = $(BUILD_DIR)/boot.o $(filter-out $(BUILD_DIR)/boot.o, $(wildcard $(BUILD_DIR)/*.o))
 LINKER_SCRIPTS = $(wildcard **/*.ld)
@@ -40,6 +40,7 @@ run:
 		-kernel $(BUILD_DIR)/$(IMG)\
 		-display none\
 		-serial null\
+		-initrd initramfs.cpio\
 		-serial stdio
 
 

@@ -24,7 +24,8 @@ void error_cmd(char argc[][100], int argv){
 }
 
 void loadimg(char arg[][100], int argv){
-    extern void *_bootloader_end, *_bootloader_start;
+    extern void *_bootloader_start;
+    
     size_t load_address, img_size;
     /*size_t bootloader_size = (size_t)&_bootloader_end - (size_t)&_bootloader_start;*/
     char buf[9];

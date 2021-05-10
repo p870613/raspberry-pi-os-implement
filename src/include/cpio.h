@@ -23,5 +23,5 @@ void cpio_parse(size_t);
 void get_file_content();
 void get_path();
 void get_content(size_t, size_t, char*);
-
+void get_all_filename();
 #endif
