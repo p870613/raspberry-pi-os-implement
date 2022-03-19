@@ -20,7 +20,8 @@ run:
 		-kernel $(BUILD_DIR)/$(IMG)\
 		-display none\
 		-serial null\
-		-serial stdio
+		-initrd src/initramfs.cpio\
+		-serial stdio 
 
 gdb:
 	$(GDB) $(GDBFLAGS) $(GDBFILE)
