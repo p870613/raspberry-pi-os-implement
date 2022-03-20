@@ -30,7 +30,7 @@ struct buddy_block {
 struct buddy_header_data buddy_system_header;
 
 void buddy_init();
-void* buddy_allocate();
+void* buddy_allocate(size_t);
 void buddy_free(void* address);
 void print_free_list();
 #endif
