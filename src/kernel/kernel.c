@@ -15,10 +15,15 @@ void kernel_main(void){
     void* a = dynamic_malloc(0x100);
     void* b = dynamic_malloc(0x100);
     void* c = dynamic_malloc(0x100);
+    void* d = dynamic_malloc(0x100);
     dynamic_status();
     dynamic_free(a);
+    dynamic_status();
     dynamic_free(b);
+    dynamic_status();
     dynamic_free(c);
+    dynamic_status();
+    dynamic_free(d);
     dynamic_status();
     /*uart_int(header_index);*/
     /*print_free_list();*/

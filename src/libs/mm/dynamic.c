@@ -6,7 +6,7 @@ void dynamic_init () {
         dynamic_system.top_chunk = buddy_allocate(PAGE_SIZE);
         dynamic_system.top_chunk->size = PAGE_SIZE - BUDDY_HEADER_OFFSET - DYNAMIC_CHUNK_HEADER_OFFSET;
         dynamic_system.top_chunk->next = NULL;
-        dynamic_system.top_chunk->pre_size = 0;
+        dynamic_system.top_chunk->pre_size = 1;
     }
 }
 
@@ -15,21 +15,73 @@ void* dynamic_malloc (size_t size) {
     size_t bin_index;
 
     for(size_t i = 0; i < DYNAMIC_BIN_MAX; i++) {
-        if (size < (i + 1) * DYNAMIC_BIN_MIN_SLOT) {
+        if (size <= (i + 1) * DYNAMIC_BIN_MIN_SLOT) {
             bin_index = i;
             break;
         }
     }
-    uart_hex(bin_index);    
-    if((bin_index + 1) * DYNAMIC_BIN_MIN_SLOT < DYNAMIC_CHUNK_HEADER_OFFSET) {
-        uart_put("size too small, it must be larger than ");
-        uart_hex(DYNAMIC_CHUNK_HEADER_OFFSET);
-        uart_put(".\n");
-        return NULL;
-    } 
+    /*if((bin_index + 1) * DYNAMIC_BIN_MIN_SLOT < DYNAMIC_CHUNK_HEADER_OFFSET) {*/
+        /*uart_put("size too small, it must be larger than ");*/
+        /*uart_hex(DYNAMIC_CHUNK_HEADER_OFFSET);*/
+        /*uart_put(".\n");*/
+        /*return NULL;*/
+    /*} */
     ret_chuck = dynamic_find_free_chunk(bin_index);
     ret_chuck->size ++; //inuse bit
+    
     return (void*)ret_chuck;
+}
+
+void dynamic_merge_chunk(struct dynamic_chunk* cur, struct dynamic_chunk* pre, struct dynamic_chunk* next) {
+    if((pre->size & 0x01) == 1)
+        return;
+    
+    int merge_size = cur->size + pre->size;
+    /*uart_recv();*/
+    if(merge_size <= DYNAMIC_BIN_MAX * DYNAMIC_BIN_MIN_SLOT) {
+        //small bin merge
+        int pre_bin_index = pre->size / DYNAMIC_BIN_MIN_SLOT - 1;
+        int merge_bin_index = merge_size / DYNAMIC_BIN_MIN_SLOT -1;
+        struct dynamic_chunk* now = dynamic_system.bin[pre_bin_index];
+        struct dynamic_chunk* now_pre = NULL;
+
+        while(now != NULL) {
+            if(now == pre) {
+                if(now_pre == NULL) {
+                    dynamic_system.bin[pre_bin_index] = now->next;
+                } else {
+                    now_pre->next = now->next;
+                }
+                pre->next = dynamic_system.bin[merge_bin_index];
+                dynamic_system.bin[merge_bin_index] = pre;
+                pre->size = merge_size;
+                next->pre_size = merge_size;
+                return ;
+            }
+            now_pre = now;
+            now = now -> next;
+        }
+    } else {
+        int pre_bin_index = pre->size / DYNAMIC_BIN_MIN_SLOT - 1;
+        struct dynamic_chunk* now = dynamic_system.bin[pre_bin_index];
+        struct dynamic_chunk* now_pre = NULL;
+        while(now != NULL) {
+            if(now == pre) {
+                if(now_pre == NULL) {
+                    dynamic_system.bin[pre_bin_index] = now->next;
+                } else {
+                    now_pre->next = now->next;
+                }
+                pre->next = dynamic_system.unsort_bin;
+                dynamic_system.unsort_bin = pre;
+                pre->size = merge_size;
+                next->pre_size = merge_size;
+                return;
+            }
+            now_pre = now;
+            now = now -> next;
+        }
+    }
 }
 
 void dynamic_free (void* address) {
@@ -37,29 +89,25 @@ void dynamic_free (void* address) {
         return;
     
     struct dynamic_chunk *chunk = address;
-    struct dynamic_chunk *pre_chunk = address - chunk->pre_size - DYNAMIC_CHUNK_HEADER_OFFSET;
-    struct dynamic_chunk *next_chunk = address + chunk->size + DYNAMIC_CHUNK_HEADER_OFFSET;
-    size_t size = chunk->size - 1;
+    chunk->size --;
+    struct dynamic_chunk *pre_chunk = address - chunk->pre_size;
+    struct dynamic_chunk *next_chunk = address + chunk->size;
+    size_t size = chunk->size;
     int bin_index = size / DYNAMIC_BIN_MIN_SLOT - 1;
-
+   
     if(chunk->size >= DYNAMIC_BIN_MIN_SLOT && chunk->size <= DYNAMIC_BIN_MAX * DYNAMIC_BIN_MIN_SLOT) {
-        // chunk => small bin
-        // pre chunk 
-        // next chunk
-        
-        // no merge
-        chunk->next = dynamic_system.bin[bin_index];
-        dynamic_system.bin[bin_index] = chunk;
+        if( (chunk->pre_size != 1) &&((pre_chunk->size & 0x01) == 0) 
+                && (pre_chunk >= ((unsigned int)address & 0xfffff000))) {
+            dynamic_merge_chunk(chunk, pre_chunk, next_chunk);
+        } else {
+            chunk->next = dynamic_system.bin[bin_index];
+            dynamic_system.bin[bin_index] = chunk;
+        }
     } else {
         //chunk => unsort bin
         chunk->next = dynamic_system.unsort_bin;
         dynamic_system.unsort_bin = chunk;
-        
     }
-
-
-
-
 }
 
 // 1. unsort bin
@@ -73,7 +121,7 @@ void* dynamic_find_free_chunk (size_t bin_index) {
    
     if(ret == NULL)
         ret = dynamic_find_free_chunk_from_top_chunk(bin_index);
-
+    
     return ret;
 }
 
@@ -195,13 +243,12 @@ void* dynamic_find_free_chunk_from_top_chunk(size_t bin_index) {
             return NULL;
     
     void* chunk = dynamic_system.top_chunk; 
-    size_t chunk_size = (bin_index + 1) * DYNAMIC_BIN_MIN_SLOT; 
+    size_t chunk_size = (bin_index + 1) * DYNAMIC_BIN_MIN_SLOT + DYNAMIC_CHUNK_HEADER_OFFSET; 
     size_t top_chunk_size = dynamic_system.top_chunk->size;
 
     dynamic_system.top_chunk->size = chunk_size;
-    dynamic_system.top_chunk = (void *)dynamic_system.top_chunk + chunk_size + DYNAMIC_CHUNK_HEADER_OFFSET;
-    dynamic_system.top_chunk = chunk + chunk_size + DYNAMIC_CHUNK_HEADER_OFFSET;
-    dynamic_system.top_chunk->size = top_chunk_size - chunk_size - DYNAMIC_CHUNK_HEADER_OFFSET;
+    dynamic_system.top_chunk = (void *)dynamic_system.top_chunk + chunk_size;
+    dynamic_system.top_chunk->size = top_chunk_size - chunk_size;
     dynamic_system.top_chunk->next = NULL;
     dynamic_system.top_chunk->pre_size = chunk_size;
 
