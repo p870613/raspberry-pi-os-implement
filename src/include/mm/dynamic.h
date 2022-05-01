@@ -35,5 +35,5 @@ void* dynamic_find_free_chunk_from_small_bin(size_t);
 void* dynamic_find_free_chunk_from_unsort_bin(size_t);
 void* dynamic_find_free_chunk_from_top_chunk(size_t);
 void dynamic_status();
-
+int dynamic_request_new_page();
 #endif

@@ -8,26 +8,22 @@ void dynamic_init () {
         dynamic_system.top_chunk->next = NULL;
         dynamic_system.top_chunk->pre_size = 1;
     }
+
 }
 
 void* dynamic_malloc (size_t size) {
     struct dynamic_chunk* ret_chuck;
     size_t bin_index;
 
+    size = size + DYNAMIC_CHUNK_HEADER_OFFSET;
     for(size_t i = 0; i < DYNAMIC_BIN_MAX; i++) {
         if (size <= (i + 1) * DYNAMIC_BIN_MIN_SLOT) {
             bin_index = i;
             break;
         }
     }
-    /*if((bin_index + 1) * DYNAMIC_BIN_MIN_SLOT < DYNAMIC_CHUNK_HEADER_OFFSET) {*/
-        /*uart_put("size too small, it must be larger than ");*/
-        /*uart_hex(DYNAMIC_CHUNK_HEADER_OFFSET);*/
-        /*uart_put(".\n");*/
-        /*return NULL;*/
-    /*} */
     ret_chuck = dynamic_find_free_chunk(bin_index);
-    ret_chuck->size ++; //inuse bit
+    ret_chuck->size ++;
     
     return (void*)ret_chuck;
 }
@@ -37,7 +33,6 @@ void dynamic_merge_chunk(struct dynamic_chunk* cur, struct dynamic_chunk* pre, s
         return;
     
     int merge_size = cur->size + pre->size;
-    /*uart_recv();*/
     if(merge_size <= DYNAMIC_BIN_MAX * DYNAMIC_BIN_MIN_SLOT) {
         //small bin merge
         int pre_bin_index = pre->size / DYNAMIC_BIN_MIN_SLOT - 1;
@@ -150,7 +145,7 @@ int remove_from_unsort_bin(void* address, size_t size) {
                 dynamic_system.unsort_bin = cur_chunk->next;
             else 
                 pre_chunk->next = cur_chunk->next;
-            uart_put("Remove chuck from unsort bin");
+            uart_put("Remove chuck from unsort bin\n");
             return 0;
         } else {
             pre_chunk = cur_chunk;
@@ -164,7 +159,7 @@ void unsort_bin_split_chunk(struct dynamic_chunk* chunk, size_t size) {
     if(chunk->size == size)
         return ;
     
-    struct dynamic_chunk *split_chunk = (void*) chunk + size + DYNAMIC_CHUNK_HEADER_OFFSET;
+    struct dynamic_chunk *split_chunk = (void*) chunk + size;
     split_chunk->size = chunk->size - size;
     split_chunk->pre_size = size;
     
@@ -231,9 +226,9 @@ int dynamic_request_new_page() {
     
     // reset top chunk
     dynamic_system.top_chunk = tmp;
-    dynamic_system.top_chunk->size = PAGE_SIZE - DYNAMIC_CHUNK_HEADER_OFFSET;
+    dynamic_system.top_chunk->size = PAGE_SIZE - BUDDY_HEADER_OFFSET - DYNAMIC_CHUNK_HEADER_OFFSET;
     dynamic_system.top_chunk->next = NULL;
-    dynamic_system.top_chunk->pre_size = 0;
+    dynamic_system.top_chunk->pre_size = 1;
 
     return 0;
 }
@@ -243,7 +238,7 @@ void* dynamic_find_free_chunk_from_top_chunk(size_t bin_index) {
             return NULL;
     
     void* chunk = dynamic_system.top_chunk; 
-    size_t chunk_size = (bin_index + 1) * DYNAMIC_BIN_MIN_SLOT + DYNAMIC_CHUNK_HEADER_OFFSET; 
+    size_t chunk_size = (bin_index + 1) * DYNAMIC_BIN_MIN_SLOT;
     size_t top_chunk_size = dynamic_system.top_chunk->size;
 
     dynamic_system.top_chunk->size = chunk_size;

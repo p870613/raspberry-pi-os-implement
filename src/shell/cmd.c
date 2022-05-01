@@ -6,6 +6,9 @@ void help(char argc[][100], int argv) {
     uart_put("loadimg\n");
     uart_put("ls\n");
     uart_put("cat\n");
+    uart_put("svc: interrupt\n");
+    uart_put("enable-timeout\n");
+    uart_put("disable-timeout\n");
     uart_put("reboot");
 }
 
@@ -109,4 +112,21 @@ void cat(char argc[][100], int argv){
     }
     uart_put("can't find file ");
     uart_put(argc[0]);
+}
+
+void svc(char argc[][100], int argv) {
+    asm volatile("svc #0");
+    return; 
+}
+
+extern void core_timer_enable(void);
+void enable_timeout(char argc[][100], int argv) {
+    core_timer_enable();
+    return ;
+}
+
+extern void core_timer_disable(void);
+void disable_timeout(char argc[][100], int argv) {
+    core_timer_disable();
+    return ;
 }

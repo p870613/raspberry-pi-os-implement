@@ -39,6 +39,12 @@ void* cmd_state_machine(char* cmdline){
         return &ls;
     else if(!strcmp(cmdline, "cat"))
         return &cat;
+    else if(!strcmp(cmdline, "svc"))
+        return &svc;
+    else if(!strcmp(cmdline, "enable-timeout"))
+        return &enable_timeout;
+    else if(!strcmp(cmdline, "disable-timeout"))
+        return &disable_timeout;
     else if(!strcmp(cmdline, "\n") || !strcmp(cmdline, "") || !strcmp(cmdline, " "))
         return &nop;
     else   
