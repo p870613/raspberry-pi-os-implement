@@ -9,6 +9,7 @@ void help(char argc[][100], int argv) {
     uart_put("svc: interrupt\n");
     uart_put("enable-timeout\n");
     uart_put("disable-timeout\n");
+    uart_put("settimeout [message] [Timeout]\n");
     uart_put("reboot");
 }
 
@@ -128,5 +129,12 @@ void enable_timeout(char argc[][100], int argv) {
 extern void core_timer_disable(void);
 void disable_timeout(char argc[][100], int argv) {
     core_timer_disable();
+    return ;
+}
+
+void settimeout(char argc[][100], int argv) {
+    for(int i = 0; i < argv; i++) {
+        printf("%s\n", argc[i]);
+    }
     return ;
 }

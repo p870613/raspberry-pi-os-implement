@@ -10,6 +10,4 @@ void exception_level_info() {
   printf("elr_el1: %x\n", elr_el1);
   asm volatile("mrs  %0, esr_el1\n": "=r"(esr_el1));
   printf("esr_el1: %x\n", esr_el1);
-  /*asm volatile("mrs  %0, CurrentEL\n": "=r"(cur_el));*/
-  /*printf("CurrentEL: %x\n", cur_el);*/
 }
