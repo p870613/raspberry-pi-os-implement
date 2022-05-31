@@ -147,3 +147,12 @@ long strtol(const char * start_ptr, const char **__restrict endptr, int base) {
 
     return (neg_flag == 1) ? -acc : acc;
 }
+
+int string_to_int(const char* str) {
+    int ret = 0;
+    for(int i = 0; i < strlen(str); i++) {
+        ret = ret * 10 + str[i] - '0';
+    }
+
+    return ret;
+}

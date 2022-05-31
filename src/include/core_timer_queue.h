@@ -5,7 +5,7 @@
 
 #define CORE_TIMER_CALLBACK_SIZE 0X100
 
-struct core_timer_callback {
+typedef struct core_timer_callback {
     void* callback_function;
     void* argv;
     size_t argc;
@@ -17,7 +17,12 @@ struct core_timer_callback {
 
 struct core_timer_callback* core_timer_callback_queue;
 
-
-
 void core_timer_interrupt_handler();
+void core_timer_queue_push(void*, int, char*, int);
+void* core_timer_queue_pop();
+void core_timer_queue_update();
+void core_timer_queue_sort();
+void core_timer_queue_status();
+void* core_timer_print_message(char*);
+
 #endif

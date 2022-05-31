@@ -8,7 +8,6 @@ void dynamic_init () {
         dynamic_system.top_chunk->next = NULL;
         dynamic_system.top_chunk->pre_size = 1;
     }
-
 }
 
 void* dynamic_malloc (size_t size) {

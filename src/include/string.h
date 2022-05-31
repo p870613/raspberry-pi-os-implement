@@ -13,6 +13,6 @@ char* strcpy(char* dest, const char* src);
 char* strncpy(char* dest, const char* src, size_t n);
 char* strcat(char* dest, const char* src);
 long strtol(const char*, const char **__restrict, int);
+int string_to_int(const char*);
 
-#define sizeof(x) ((char*)(&x + 1) - (char*)(&x))
 #endif

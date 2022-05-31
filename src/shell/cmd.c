@@ -1,4 +1,7 @@
 #include "cmd.h"
+#include "core_timer_queue.h"
+#include <string.h>
+#include <stdio.h>
 
 void help(char argc[][100], int argv) {
     uart_put("help: print all available commands\n");
@@ -133,8 +136,10 @@ void disable_timeout(char argc[][100], int argv) {
 }
 
 void settimeout(char argc[][100], int argv) {
-    for(int i = 0; i < argv; i++) {
-        printf("%s\n", argc[i]);
-    }
+    char mes[100];
+    strncpy(mes, argc[0], 100);
+    int timeout = string_to_int(argc[1]);
+    printk("timeout: %d, mes: %s \n", timeout, mes);
+    core_timer_queue_push(core_timer_print_message, timeout, mes, strlen(mes));
     return ;
 }
