@@ -13,6 +13,7 @@ void help(char argc[][100], int argv) {
     uart_put("enable-timeout\n");
     uart_put("disable-timeout\n");
     uart_put("settimeout [message] [Timeout]\n");
+    uart_put("run\n");
     uart_put("reboot");
 }
 
@@ -141,5 +142,16 @@ void settimeout(char argc[][100], int argv) {
     int timeout = string_to_int(argc[1]);
     printk("timeout: %d, mes: %s \n", timeout, mes);
     core_timer_queue_push(core_timer_print_message, timeout, mes, strlen(mes));
+    return ;
+}
+
+void run(char argc[][100], int argv) {
+    void* file_address = load_file("a.out", 5);
+    if (file_address != NULL) {
+        asm volatile("mov x0, #0x3c0\n" "msr spsr_el1, x0\n");
+        asm volatile("mov x0, %0\n" "msr elr_el1, x0\n" "eret\n"::"r"(file_address));
+    } else {
+        printk("Can't find file\n");
+    }
     return ;
 }

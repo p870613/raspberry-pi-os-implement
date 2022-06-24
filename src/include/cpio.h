@@ -24,4 +24,6 @@ void get_file_content();
 void get_path();
 void get_content(size_t, size_t, char*);
 void get_all_filename();
+void* load_file(char*, size_t);
+
 #endif

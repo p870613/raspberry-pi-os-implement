@@ -49,6 +49,7 @@ void cpio_parse(size_t address){
     size_t file_size, name_size, file_address, name_address;
     
     while(1) {
+       printf("%d \n", index);
        get_name_size(&name_size, cur_address);
        get_file_size(&file_size, cur_address);
 
@@ -63,6 +64,7 @@ void cpio_parse(size_t address){
        padding(&cur_address);
        
        if(check_cpio_end(name_size, file_address) == 0){
+           printf("--");
            break;
        }
 
@@ -71,6 +73,7 @@ void cpio_parse(size_t address){
        index ++;
     }
     header_index = index;
+    printf("%d \n", header_index);
 }
 
 void get_content(size_t address, size_t offset, char* buf){
@@ -98,6 +101,14 @@ void get_file_content(char* filename) {
 
         if(!strcmp(filename, buf)) {
             uart_put("123");
+        }
+    }
+}
+
+void* load_file(char* filename, size_t filename_size) {
+    for(int i = 0; i < header_index; i++) {
+        if (strncmp(header[i].name_address, filename, filename_size)) {
+            return (void*)header[i].file_address;
         }
     }
 }

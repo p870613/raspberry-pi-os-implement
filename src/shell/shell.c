@@ -47,6 +47,8 @@ void* cmd_state_machine(char* cmdline){
         return &disable_timeout;
     else if(!strcmp(cmdline, "settimeout"))
         return &settimeout;
+    else if(!strcmp(cmdline, "run"))
+        return &run;
     else if(!strcmp(cmdline, "\n") || !strcmp(cmdline, "") || !strcmp(cmdline, " "))
         return &nop;
     else   
