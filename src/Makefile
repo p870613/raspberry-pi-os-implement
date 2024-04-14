@@ -1,5 +1,5 @@
 CC = aarch64-linux-gnu-gcc
-CCFLAGS = -Iinclude -Wall -ffreestanding  -nostdlib -nostartfiles -ggdb
+CCFLAGS = -Iinclude -Wall -ffreestanding  -nostdlib -nostartfiles -ggdb -Wno-unused-but-set-variable
 
 LD = aarch64-linux-gnu-ld
 LDFLAGS = -T

@@ -1,4 +1,5 @@
 #include <mm/buddy.h>
+#include <stdio.h>
 
 int get_order(size_t);
 int get_index(void* );
@@ -18,7 +19,7 @@ void buddy_init() {
     ((struct buddy_block*) buddy_system_header.start) -> order = BUDDY_MAX_ORDER;
     buddy_system_header.inuse[0] = BUDDY_MAX_ORDER;
     buddy_system_header.free_list[BUDDY_MAX_ORDER] = buddy_system_header.start;
-    memset(buddy_system_header.inuse + 1, BUDDY_BLOCK_NUM - 1, 'F');
+    memset(buddy_system_header.inuse + 1, 'F', (size_t)BUDDY_BLOCK_NUM - 1);
 }
 
 int get_order(size_t size) {
@@ -90,7 +91,7 @@ void buddy_reset_block(void* address, int order) {
     size_t size = (1 << order);
     int index = get_index(address);
     buddy_system_header.inuse[index] = order;
-    memset(buddy_system_header.inuse + index + 1, size - 1, 'F');
+    memset(buddy_system_header.inuse + index + 1, 'F', size - 1);
 }
 
 void merge(void* address) {
@@ -162,7 +163,7 @@ void* buddy_find_free_block(int order) {
 void update_inuse(struct buddy_block* remain, int order) {
     int index = ((size_t) remain - (size_t)buddy_system_header.start) / (PAGE_SIZE * BUDDY_HEADER_OFFSET);
     buddy_system_header.inuse[index] = order;
-    memset(buddy_system_header.inuse + index + 1, (1 << order), 'F');
+    memset(buddy_system_header.inuse + index + 1, 'F', 1 << order);
 }
 
 void traverse_list(struct buddy_block* head) {
@@ -175,7 +176,7 @@ void traverse_list(struct buddy_block* head) {
         uart_put("[");
         uart_int(cur -> order);
         uart_put(",");
-        uart_hex(cur);
+        uart_hex((unsigned long long)cur);
         uart_put("], ");
         cur = cur -> next;
     }

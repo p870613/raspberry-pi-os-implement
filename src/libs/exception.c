@@ -2,7 +2,7 @@
 #include <type.h>
 #include <exception.h>
 void exception_level_info() {
-  int32_t spsr_el1, esr_el1, cur_el;
+  int32_t spsr_el1, esr_el1;
   size_t elr_el1;
   asm volatile("mrs  %0, spsr_el1": "=r"(spsr_el1));
   printf("spsr_el1: %x\n", spsr_el1);

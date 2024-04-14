@@ -1,5 +1,6 @@
 #include <mm/dynamic.h>
 #include <mm/buddy.h>
+#include <stdio.h>
 
 void dynamic_init () {
     if (dynamic_system.top_chunk == NULL) {
@@ -111,7 +112,7 @@ void dynamic_free (void* address) {
 
     if(chunk->size >= DYNAMIC_BIN_MIN_SLOT && chunk->size <= DYNAMIC_BIN_MAX * DYNAMIC_BIN_MIN_SLOT) {
         if( (chunk->pre_size != 1) &&((pre_chunk->size & 0x01) == 0) 
-                && (pre_chunk >= ((unsigned int)address & 0xfffff000))) {
+                && ((unsigned long long)pre_chunk >= ((unsigned long long)address & 0xfffff000))) {
             dynamic_merge_chunk(chunk, pre_chunk, next_chunk);
         } else {
             chunk->next = dynamic_system.bin[bin_index];
@@ -171,9 +172,6 @@ int remove_from_unsort_bin(void* address, size_t size) {
 }
 
 struct dynamic_chunk* unsort_bin_split_chunk(struct dynamic_chunk* chunk, size_t size) {
-    if(chunk->size == size)
-        return ;
-   
     struct dynamic_chunk *split_chunk = (void*) chunk + size;
     split_chunk->size = size;
     
@@ -194,11 +192,10 @@ struct dynamic_chunk* unsort_bin_split_chunk(struct dynamic_chunk* chunk, size_t
 }
 
 void* dynamic_find_free_chunk_from_unsort_bin(size_t bin_index) {
-    struct dynamic_chunk *cur_chunk, *pre_chunk;
+    struct dynamic_chunk *cur_chunk = dynamic_system.unsort_bin;
+    struct dynamic_chunk *pre_chunk = NULL;
     size_t size = (bin_index + 1) * DYNAMIC_BIN_MIN_SLOT + DYNAMIC_CHUNK_HEADER_OFFSET;
     
-    cur_chunk = dynamic_system.unsort_bin;
-    pre_chunk = NULL;
     while (cur_chunk != NULL) {
         if(size <= cur_chunk->size) {
             if (remove_from_unsort_bin(cur_chunk, size) == -1) {
@@ -325,10 +322,10 @@ void dynamic_test()
         
 
     dynamic_free(p);
-    /*dynamic_free(ptr[0]);*/
-    /*dynamic_free(ptr[1]);*/
-    /*dynamic_free(ptr[2]);*/
-    /*dynamic_free(ptr[3]);*/
+    dynamic_free(ptr[0]);
+    dynamic_free(ptr[1]);
+    dynamic_free(ptr[2]);
+    dynamic_free(ptr[3]);
     
     dynamic_status();
     p = dynamic_malloc(0x10);

@@ -10,7 +10,7 @@ void* memcpy(void* dest, const void* src, size_t n) {
   return dest;
 }
 
-void* memset(void* dest, uint8_t val, size_t n) {
+void* memset(void* dest, int val, size_t n) {
   int8_t* dest_ptr = dest;
 
   while(n--) {

@@ -22,8 +22,8 @@ void get_file_address(size_t* file_address, size_t address) {
     *file_address = address;
 }
 
-int padding(char* address) {
-    char* t = address;
+int padding(size_t address) {
+    char* t = (char*) address;
     int ret = 0;
     while(*t == '\0') {
         ret ++;
@@ -107,7 +107,7 @@ void get_file_content(char* filename) {
 
 void* load_file(char* filename, size_t filename_size) {
     for(int i = 0; i < header_index; i++) {
-        if (!strncmp(header[i].name_address, filename, filename_size)) {
+        if (!strncmp((char*)header[i].name_address, filename, filename_size)) {
             return (void*)header[i].file_address;
         }
     }

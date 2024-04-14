@@ -12,7 +12,7 @@ void core_timer_interrupt_handler() {
     struct core_timer_callback* pop_node = NULL;
 
     while(1) {
-        pop_node = (struct core_timer_queue_callback*) core_timer_queue_pop();
+        pop_node = core_timer_queue_pop();
         if(pop_node == NULL){
             break;
         } else {
@@ -110,4 +110,5 @@ void core_timer_queue_status() {
 
 void* core_timer_print_message(char* str) {
     printf("core time: %f, message: %s", get_core_time(), str);
+    return NULL;
 }
