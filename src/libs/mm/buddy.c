@@ -1,6 +1,5 @@
 #include <mm/buddy.h>
 
-void* buddy_find_free_block();
 int get_order(size_t);
 int get_index(void* );
 int is_free(size_t, int);
@@ -152,6 +151,7 @@ void* buddy_find_free_block(int order) {
         struct buddy_block* remain;
         remain = find_block + (PAGE_SIZE + BUDDY_HEADER_OFFSET) * (1 << order);
         remain -> next = buddy_system_header.free_list[order];
+        remain -> order = order;
         buddy_system_header.free_list[order] = remain;
         
         update_inuse(remain, order);
@@ -186,4 +186,18 @@ void print_free_list() {
         uart_int(i);
         traverse_list(buddy_system_header.free_list[i]);
     }
+}
+
+void buddy_test()
+{
+    void* a= buddy_allocate(4098);
+    print_free_list();
+    void *b = buddy_allocate(20);
+    print_free_list();
+
+    buddy_free(a);
+    print_free_list();
+    buddy_free(b);
+    print_free_list();
+
 }
