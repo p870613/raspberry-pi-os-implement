@@ -6,6 +6,8 @@
 #include <mm/dynamic.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <core_timer_queue.h>
+#include <exception.h>
 
 void kernel_main(void){
     uart_init();
