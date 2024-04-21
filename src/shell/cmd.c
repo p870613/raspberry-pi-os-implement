@@ -149,7 +149,7 @@ void run(char argc[][100], int argv) {
     void* file_address = load_file("a.out", 5);
     if (file_address != NULL) {
         asm volatile("mov x0, #0x3c0\n" "msr spsr_el1, x0\n");
-        asm volatile("mov x0, %0\n" "msr elr_el1, x0\n" "eret\n"::"r"(file_address));
+        asm volatile("mov x0, %0\n" "msr elr_el1, x0\n" "eret\n"::"r"(file_address + 0x40));
     } else {
         printk("Can't find file\n");
     }
