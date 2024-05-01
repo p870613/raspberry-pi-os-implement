@@ -1,1 +1,6 @@
 build/*
+log
+./*/*/.*
+./*/.*
+core
+peda-session-kernel.elf.txt
