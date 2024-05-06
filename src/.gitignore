@@ -4,3 +4,5 @@ log
 ./*/.*
 core
 peda-session-kernel.elf.txt
+kernel.elf
+kernel8.img
