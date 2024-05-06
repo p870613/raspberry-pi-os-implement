@@ -2,14 +2,17 @@
 #define _SCHED_H
 
 #include <task_queue.h>
+#include <type.h>
 
 #define TASK_POOL_SIZE      0X40
 #define TASK_STACK_SIZE     0X1000
 #define KERNEL_STACK_ADDR   0x11000000
 #define USER_STACK_ADDR     (11000000 + TASK_STACK_SIZE * TASK_POOL_SIZE)
 
-#define TASK_STATUS_DEAD    0
-#define TASK_STATUS_READY   1
+enum task_status {
+    TASK_STATUS_DEAD,
+    TASK_STATUS_READY,
+};
 
 
 struct trapframe { // user space
@@ -52,6 +55,9 @@ struct task_struct {
 struct task_struct task_pool[TASK_POOL_SIZE];
 struct task_queue_struct run_queue;
 
-extern void switch_to(struct task_struct);
-extern int get_current(void);
+void schedule(void);
+extern void disable_interrupt(void);
+extern void enable_interrupt(void);
+extern void switch_to(struct task_struct*, struct task_struct*);
+extern struct task_struct* get_current(void);
 #endif
