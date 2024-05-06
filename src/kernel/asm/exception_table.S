@@ -103,3 +103,14 @@ irq_handler:
     load_all
     msr DAIFClr, 0xf
     eret
+
+.global enable_interrupt
+enable_interrupt:
+    msr DAIFClr, 0xf
+    ret
+
+.global disable_interrupt
+disable_interrupt:
+    msr DAIFSet, 0xf
+    ret
+

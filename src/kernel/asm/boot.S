@@ -1,6 +1,4 @@
-#include <mm/mm.h>
-
-.section ".text"
+.section ".start_text"
 
 .global _start
 
@@ -19,8 +17,11 @@ _kernel_loader:
     mov sp, x0
     ldr x0, =_bss_start
     ldr x1, =_bss_end
-    sub x1, x1, x0
-    bl memzero //clear _bss
+
+_bss_init:
+    str xzr, [x0], #8
+    cmp x0, x1
+    bne _bss_init
 
 _from_el2_to_el1:
     # EL1 use aarch64

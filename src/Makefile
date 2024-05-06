@@ -1,6 +1,6 @@
 CC = aarch64-linux-gnu-gcc
-CCFLAGS = -Iinclude -Wall -ffreestanding  -nostdlib -nostartfiles -ggdb -Wno-unused-but-set-variable
-
+CFLAGS = -Iinclude -Wall -ffreestanding  -nostdlib -nostartfiles -ggdb -Wno-unused-but-set-variable
+#CFLAGS = -Wall -ggdb -Og -nostdlib -nostartfiles -ffreestanding -Iinclude -Ilib -Iperipheral -Ikernel -Imm -Itest
 LD = aarch64-linux-gnu-ld
 LDFLAGS = -T
 
@@ -11,26 +11,29 @@ GDB = gdb-multiarch
 GDBFLAGS = -x 
 GDBFILE = ./debug.gdb
 
-BUILD_DIR = build
-ELF = kernel.elf
-SRC = $(wildcard **/*.S) $(wildcard **/*.c) $(wildcard **/mm/*.c)
-IMG = kernel8.img
+BUILD_DIR = ./
+HEADER := $(wildcard */*.h) $(wildcard */*/*.h)
+ELF = $(BUILD_DIR)kernel.elf
+SRC = $(wildcard **/*.c) $(wildcard */*/*.c)
+IMG = $(BUILD_DIR)kernel8.img
+ASM := $(wildcard **/*.S) $(wildcard */*/*.S)
+OBJ = $(patsubst %.S, %.o, $(ASM)) $(patsubst %.c, %.o, $(SRC)) 
 #OBJ = $(BUILD_DIR)/exception.o $(BUILD_DIR)/boot.o $(filter-out $(BUILD_DIR)/boot.o, $(BUILD_DIR)/exception.o, $(wildcard $(BUILD_DIR)/*.o))
-OBJ = $(BUILD_DIR)/boot.o $(filter-out $(BUILD_DIR)/boot.o, $(wildcard $(BUILD_DIR)/*.o))
+#OBJ = $(BUILD_DIR)/boot.o $(filter-out $(BUILD_DIR)/boot.o, $(wildcard $(BUILD_DIR)/*.o))
 LINKER_SCRIPTS = $(wildcard **/*.ld)
 
-all:
-	mkdir -p $(BUILD_DIR) 
-	$(CC) $(CCFLAGS) -c $(SRC) 
-	mv *.o $(BUILD_DIR)
-	make kerne
-kerne:
-	$(LD) $(LDFLAGS) $(LINKER_SCRIPTS) -o $(BUILD_DIR)/$(ELF) $(OBJ)
-	$(OBJCOPY) $(OBJCOPYFLAGS) $(BUILD_DIR)/$(ELF) $(BUILD_DIR)/$(IMG)
+all: $(IMG) 
+%o: %s %c
+$(ELF): $(OBJ)
+	echo $(ASM)
+	$(LD) $(LDFLAGS) $(LINKER_SCRIPTS) -o $@ $(OBJ)
+
+$(IMG): $(ELF)
+	$(OBJCOPY) -O binary $< $@
 
 run-debug:
 	qemu-system-aarch64 -M raspi3\
-		-kernel $(BUILD_DIR)/$(IMG)\
+		-kernel $(IMG)\
 		-display none\
 		-initrd initramfs.cpio\
 		-serial null\
@@ -39,7 +42,7 @@ run-debug:
 
 run:
 	qemu-system-aarch64 -M raspi3\
-		-kernel $(BUILD_DIR)/$(IMG)\
+		-kernel $(IMG)\
 		-display none\
 		-serial null\
 		-initrd initramfs.cpio\
@@ -48,7 +51,7 @@ run:
 
 run-ramdisk:
 	qemu-system-aarch64 -M raspi3\
-		-kernel $(BUILD_DIR)/$(IMG)\
+		-kernel $(IMG)\
 		-display none\
 		-serial null\
 		-initrd initramfs.cpio\
@@ -58,8 +61,10 @@ gdb:
 	$(GDB) $(GDBFLAGS) $(GDBFILE)
 
 objdump:
-	aarch64-linux-gnu-objdump -d ./build/kernel.elf | less 
+	aarch64-linux-gnu-objdump -d $(ELF) | less 
 
 clean:
 	rm -rf build
-	rm -rf *.o
+	rm -rf $(wildcard */*.o) $(wildcard */*/*.o)
+	rm -rf $(ELF)
+	rm -rf $(IMG)

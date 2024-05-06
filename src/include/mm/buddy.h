@@ -1,7 +1,6 @@
 #ifndef _BUDDY_H
 #define _BUDDY_H
 
-#include <mm/mm.h>
 #include <type.h>
 #include <string.h>
 

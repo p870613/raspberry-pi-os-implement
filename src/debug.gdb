@@ -1,2 +1,2 @@
-file build/kernel.elf
+file kernel.elf
 target remote :1234

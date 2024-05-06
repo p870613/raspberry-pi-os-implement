@@ -1,7 +1,11 @@
 SECTIONS {
     . = 0x80000;
-
-    .text ALIGN(0x10) : { *(.text) }
+    
+    .text ALIGN(0x10) :
+    { 
+        *(.start_text);
+        *(.text);
+    }
     .data ALIGN(0x10) : { *(.data) }
 
     .bss ALIGN(0x10) : 

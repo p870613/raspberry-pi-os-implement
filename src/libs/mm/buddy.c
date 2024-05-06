@@ -1,4 +1,5 @@
 #include <mm/buddy.h>
+#include <mm/mm.h>
 #include <stdio.h>
 
 int get_order(size_t);

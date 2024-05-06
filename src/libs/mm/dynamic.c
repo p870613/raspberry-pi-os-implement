@@ -1,5 +1,6 @@
 #include <mm/dynamic.h>
 #include <mm/buddy.h>
+#include <mm/mm.h>
 #include <stdio.h>
 
 void dynamic_init () {
