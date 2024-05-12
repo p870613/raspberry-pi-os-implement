@@ -56,6 +56,7 @@ struct task_struct task_pool[TASK_POOL_SIZE];
 struct task_queue_struct run_queue;
 
 void schedule(void);
+void task_init(void);
 extern void disable_interrupt(void);
 extern void enable_interrupt(void);
 extern void switch_to(struct task_struct*, struct task_struct*);

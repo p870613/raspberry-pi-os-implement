@@ -28,5 +28,5 @@ void uart_hex(unsigned int);
 void uart_int(int);
 
 void uart_get_cmd(char*);
-
+void delay(unsigned int);
 #endif

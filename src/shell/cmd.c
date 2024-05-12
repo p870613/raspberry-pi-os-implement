@@ -2,6 +2,7 @@
 #include "core_timer_queue.h"
 #include <string.h>
 #include <stdio.h>
+#include <timer.h>
 
 void help(char argc[][100], int argv) {
     uart_put("help: print all available commands\n");
@@ -124,13 +125,11 @@ void svc(char argc[][100], int argv) {
     return; 
 }
 
-extern void core_timer_enable(void);
 void enable_timeout(char argc[][100], int argv) {
     core_timer_enable();
     return ;
 }
 
-extern void core_timer_disable(void);
 void disable_timeout(char argc[][100], int argv) {
     core_timer_disable();
     return ;

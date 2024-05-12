@@ -1,5 +1,6 @@
 #include <task_queue.h>
 #include <sched.h>
+#include <stdio.h>
 
 void run_queue_push(struct task_struct *task)
 {
@@ -16,7 +17,7 @@ void run_queue_push(struct task_struct *task)
 struct task_struct* run_queue_pop(void)
 {  
     struct task_struct *ret;
-
+    
     if (run_queue.head == NULL)
         return NULL;
 
@@ -24,9 +25,22 @@ struct task_struct* run_queue_pop(void)
         run_queue.tail = NULL;
  
     ret = run_queue.head;
-    ret->next = NULL;
-
     run_queue.head = run_queue.head->next;
+    ret->next = NULL;
        
     return ret;
+}
+
+void run_queue_status(void)
+{
+    struct task_struct *cur = run_queue.head;
+
+    if (cur == NULL)
+        return;
+
+    while (cur != NULL) {
+        printf("task_id: %d ,", cur->task_id);
+        cur = cur->next;
+    }
+    printf("\n");
 }

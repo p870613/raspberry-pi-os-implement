@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <core_timer_queue.h>
 #include <exception.h>
+#include <sched.h>
+#include <timer.h>
 
 void kernel_main(void){
     uart_init();
@@ -17,5 +19,7 @@ void kernel_main(void){
     buddy_init();
     dynamic_init();
     exception_level_info();
+    core_timer_enable();
+    task_init();
     shell();
 } 

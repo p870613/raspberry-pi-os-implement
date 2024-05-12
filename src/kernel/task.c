@@ -1,5 +1,6 @@
 #include "sched.h"
 
+#include <peripheral/uart.h>
 #include <stdio.h>
 #include <task_queue.h>
 
@@ -50,11 +51,29 @@ void idle_task()
     }
 }
 
-/*
+void foo()
+{
+    for (int i = 0; i < 10; i++) {
+        printf("Thread id: %d %d\n", get_current()->task_id, i);
+        delay(1000);
+    }
+}
+
 void task_init()
 {
     struct task_struct fake;
+    
+    disable_interrupt();
 
+    task_create(idle_task);
+    
+    for (int i = 0; i < 5; i++)
+           task_create(foo);
+    
+    run_queue_pop();
+    run_queue_status();
+    
+    enable_interrupt();
 
+    switch_to(&fake, &task_pool[0]);
 }
-*/

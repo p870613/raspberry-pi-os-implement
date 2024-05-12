@@ -1,4 +1,5 @@
 #include "peripheral/uart.h"
+#include <type.h>
 
 void uart_send(char c) {
     while(1) {
@@ -119,13 +120,29 @@ char uart_recv(void) {
     return ret == '\r' ? '\n' : ret;
 }
 
-void delay(unsigned int n){
-    while(n --)
-        asm volatile("nop");
+size_t get_time()
+{
+    size_t count, freq;
+    
+    asm volatile("mrs %[result], cntpct_el0": [result]"=r"(count));
+    asm volatile("mrs %[result], cntfrq_el0": [result]"=r"(freq));
+
+    return (1000 * count) / freq;
+}
+
+void delay(unsigned int n)
+{
+    int start_time = get_time();
+    int cur_time = start_time;
+
+    while(cur_time - start_time < n) {
+        cur_time = get_time();
+    }
 }
 
 void uart_init(void){
     unsigned int selector = *GPFSEL1;
+    register unsigned int r;
 
     selector &= ~(7<<12);                   // clean gpio14
     selector |= 2<<12;                      // set alt5 for gpio14
@@ -134,9 +151,9 @@ void uart_init(void){
     *GPFSEL1 = selector;
 
     *GPPUD = 0;
-    delay(150);
+    r = 150; while(r--) {asm volatile("nop"); }
     *GPPUDCLK0 = (1<<14)|(1<<15);
-    delay(150);
+    r = 150; while(r--) {asm volatile("nop"); }
     *GPPUDCLK0 = 0;
 
     *AUX_ENABLES |= 1;                   //Enable mini uart (this also enables access to its registers)

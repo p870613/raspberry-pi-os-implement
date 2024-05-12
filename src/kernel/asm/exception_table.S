@@ -1,7 +1,7 @@
 .section ".text"
 
 .macro save_all
-    sub sp, sp, 32 * 8
+    sub sp, sp, #16 * 17
     stp x0, x1, [sp ,16 * 0]
     stp x2, x3, [sp ,16 * 1]
     stp x4, x5, [sp ,16 * 2]
@@ -17,10 +17,19 @@
     stp x24, x25, [sp ,16 * 12]
     stp x26, x27, [sp ,16 * 13]
     stp x28, x29, [sp ,16 * 14]
-    str x30, [sp, 16 * 15]
+    mrs x9, sp_el0
+    stp x30, x9, [sp ,16 * 15]
+    mrs x9, elr_el1
+    mrs x10, spsr_el1
+    stp x9, x10, [sp, 16 * 16]
 .endm
 
 .macro load_all
+    ldp  x30, x9, [sp, #16 * 15]
+    msr  sp_el0, x9
+    ldp  x9, x10, [sp, #16 * 16]
+    msr  elr_el1, x9
+    msr  spsr_el1, x10
     ldp x0, x1, [sp ,16 * 0]
     ldp x2, x3, [sp ,16 * 1]
     ldp x4, x5, [sp ,16 * 2]
@@ -37,7 +46,7 @@
     ldp x26, x27, [sp ,16 * 13]
     ldp x28, x29, [sp ,16 * 14]
     ldr x30, [sp, 16 * 15]
-    add sp, sp, 32 * 8
+    add sp, sp, #16 * 17
 .endm
 
 .align 11
@@ -100,6 +109,7 @@ irq_handler:
     msr DAIFSet, 0xf
     save_all
     bl irq_routing
+    bl schedule
     load_all
     msr DAIFClr, 0xf
     eret
