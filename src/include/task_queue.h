@@ -9,6 +9,7 @@ struct task_queue_struct {
 
 void run_queue_push(struct task_struct*);
 void run_queue_status(void);
+void run_queue_remove(struct task_struct*);
 struct task_struct* run_queue_pop(void);
 
 #endif

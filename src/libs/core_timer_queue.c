@@ -20,6 +20,7 @@ void core_timer_interrupt_handler() {
             free(pop_node);
         }
     }
+    asm volatile("mrs x0, cntfrq_el0\n" "msr cntp_tval_el0, x0\n");
     return ;
 }
 

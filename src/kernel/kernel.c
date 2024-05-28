@@ -20,6 +20,6 @@ void kernel_main(void){
     dynamic_init();
     exception_level_info();
     core_timer_enable();
-    task_init();
+    task_user();
     shell();
 } 

@@ -24,6 +24,7 @@ void* dynamic_malloc (size_t size) {
     }
     ret_chunk = dynamic_find_free_chunk(bin_index);
     ret_chunk->size ++;
+    ret_chunk->next = NULL;
     
     return (void*)(ret_chunk) + DYNAMIC_CHUNK_HEADER_OFFSET;
 }

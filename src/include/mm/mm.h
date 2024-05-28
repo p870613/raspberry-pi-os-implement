@@ -10,4 +10,6 @@
 
 #define LOW_MEMORY (2 * SECTION_SIZE)
 
+void *kmalloc(size_t);
+void kfree(void *);
 #endif

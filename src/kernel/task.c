@@ -3,7 +3,7 @@
 #include <peripheral/uart.h>
 #include <stdio.h>
 #include <task_queue.h>
-
+#include "syscall.h"
 // disable interrupt
 // create task 
 // enable interrupt
@@ -40,6 +40,7 @@ void idle_task()
         for (int i = 0; i < TASK_POOL_SIZE; i++) {
             if(task_pool[i].status == TASK_STATUS_DEAD &&
                task_pool[i].task_id != 0) {
+                //if (task_pool[i].start)
                 // free start
                 task_pool[i].start = NULL;
                 task_pool[i].kstack = NULL;
@@ -59,6 +60,32 @@ void foo()
     }
 }
 
+void user_task()
+{
+    char* argv[] = {"argv_test", "-a", "test", 0};
+    do_exec("argv_test", argv);
+}
+
+void task_user()
+{
+    struct task_struct fake;
+ 
+    disable_interrupt();
+    task_create(idle_task);
+    
+    for (int i = 0; i < 5; i++)
+           task_create(foo);
+
+    task_create(user_task);
+
+    run_queue_pop();
+    run_queue_status();
+
+    enable_interrupt();
+
+    switch_to(&fake, &task_pool[0]);
+}
+
 void task_init()
 {
     struct task_struct fake;
@@ -70,10 +97,17 @@ void task_init()
     for (int i = 0; i < 5; i++)
            task_create(foo);
     
+    task_create(user_task);
+
     run_queue_pop();
     run_queue_status();
     
     enable_interrupt();
 
     switch_to(&fake, &task_pool[0]);
+}
+
+struct trapframe *get_trapframe(struct task_struct *t)
+{
+    return (struct trapframe *)(t->kstack + TASK_STACK_SIZE - sizeof(struct trapframe));
 }

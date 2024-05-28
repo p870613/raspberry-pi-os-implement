@@ -31,6 +31,24 @@ struct task_struct* run_queue_pop(void)
     return ret;
 }
 
+void run_queue_remove(struct task_struct *del)
+{
+    struct task_struct *cur = run_queue.head, *prev = NULL;
+
+    while (cur != NULL) {
+        if (cur == del) {
+            if (prev != NULL) {
+                prev->next = cur->next;
+                if (cur == run_queue.tail)
+                    run_queue.tail = prev;
+            }
+            return;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+}
+
 void run_queue_status(void)
 {
     struct task_struct *cur = run_queue.head;

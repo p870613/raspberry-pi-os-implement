@@ -4,7 +4,7 @@
 void schedule(void)
 {
     struct task_struct *cur, *next;
-
+    
     cur = get_current();
     if (cur->resched == 1) {
         disable_interrupt();

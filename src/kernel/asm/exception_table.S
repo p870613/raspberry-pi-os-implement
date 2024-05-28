@@ -95,21 +95,47 @@ _set_exception_vector_table:
     msr vbar_el1, x0
     ret
 
+.global not_syscall
+.global kernel_exit
 exception_handler:
+  save_all
+  #checks the source of exception
+  mrs x9, esr_el1
+  mov x10, x9
+  #EC( 1<< 26) = 010101 = 0x15: SVC instruction execution in AArch64 state
+  lsr x9, x9, #26
+  cmp x9, #0x15
+  bne not_syscall
+  #imm16 low 16bit value 0: syscall 
+  and x10, x10, 0xffff
+  cmp x10, #0
+  bne not_syscall
+  bl syscall
+  //store return value
+  str x0, [sp, #16 * 0]
+  b kernel_exit
+not_syscall:
+  #bl exception_level_info
+kernel_exit:
+  bl schedule
+  load_all
+  #bl exception_level_info
+  eret
+
+#exception_handler:
     # enable interrupt
-    msr DAIFSet, 0xf 
-    save_all
-    bl exception_level_info
-    load_all
+    #msr DAIFSet, 0xf 
+    #save_all
+    #bl exception_level_info
+    #load_all
     # disable interrupt
-    msr DAIFClr, 0xf
-    eret
+    #msr DAIFClr, 0xf
+    #eret
 
 irq_handler:
     msr DAIFSet, 0xf
     save_all
     bl irq_routing
-    bl schedule
     load_all
     msr DAIFClr, 0xf
     eret
@@ -124,3 +150,8 @@ disable_interrupt:
     msr DAIFSet, 0xf
     ret
 
+#.global kernel_exit
+#kernel_exit:
+#    bl schedule
+#    load_all
+#    eret

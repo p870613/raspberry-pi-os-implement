@@ -57,8 +57,11 @@ struct task_queue_struct run_queue;
 
 void schedule(void);
 void task_init(void);
+void task_user(void);
+struct trapframe *get_trapframe(struct task_struct *);
 extern void disable_interrupt(void);
 extern void enable_interrupt(void);
 extern void switch_to(struct task_struct*, struct task_struct*);
+extern void kernel_exit();
 extern struct task_struct* get_current(void);
 #endif

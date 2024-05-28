@@ -11,3 +11,8 @@ void exception_level_info() {
   asm volatile("mrs  %0, esr_el1\n": "=r"(esr_el1));
   printf("esr_el1: %x\n", esr_el1);
 }
+
+void syscall_number_error()
+{
+    printf("syscall number error\n");
+}
