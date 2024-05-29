@@ -175,22 +175,23 @@ int remove_from_unsort_bin(void* address, size_t size) {
 
 struct dynamic_chunk* unsort_bin_split_chunk(struct dynamic_chunk* chunk, size_t size) {
     struct dynamic_chunk *split_chunk = (void*) chunk + size;
-    split_chunk->size = size;
+    split_chunk->size = chunk->size - size;
     
     chunk->pre_size = size;
-    chunk->size = chunk->size - size;
+    chunk->size = size;
     
-    if(chunk->size <= DYNAMIC_BIN_MAX * DYNAMIC_BIN_MIN_SLOT) {
+    
+    if(split_chunk->size <= DYNAMIC_BIN_MAX * DYNAMIC_BIN_MIN_SLOT) {
         // put samll bin
-        int bin_index = chunk->size / DYNAMIC_BIN_MIN_SLOT - 1;
-        chunk->next = dynamic_system.bin[bin_index];
-        dynamic_system.bin[bin_index] = chunk;
+        int bin_index = split_chunk->size / DYNAMIC_BIN_MIN_SLOT - 1;
+        split_chunk->next = dynamic_system.bin[bin_index];
+        dynamic_system.bin[bin_index] = split_chunk;
     } else {
         // put unsort bin
-        chunk->next = dynamic_system.unsort_bin;
-        dynamic_system.unsort_bin = chunk;
+        split_chunk->next = dynamic_system.unsort_bin;
+        dynamic_system.unsort_bin = split_chunk;
     }
-    return split_chunk;
+    return chunk;
 }
 
 void* dynamic_find_free_chunk_from_unsort_bin(size_t bin_index) {
@@ -253,10 +254,10 @@ void* dynamic_find_free_chunk_from_top_chunk(size_t bin_index) {
         if(dynamic_request_new_page() == -1) 
             return NULL;
     
+    size_t top_chunk_size = dynamic_system.top_chunk->size;
     struct dynamic_chunk *chunk = dynamic_system.top_chunk; 
     size_t chunk_size = (bin_index + 1) * DYNAMIC_BIN_MIN_SLOT;
     chunk->size = chunk_size;
-    size_t top_chunk_size = dynamic_system.top_chunk->size;
 
     dynamic_system.top_chunk = (void *)dynamic_system.top_chunk + chunk_size + DYNAMIC_CHUNK_HEADER_OFFSET;
     dynamic_system.top_chunk->size = top_chunk_size - chunk_size - DYNAMIC_CHUNK_HEADER_OFFSET;
@@ -321,17 +322,14 @@ void dynamic_test()
     ptr[1] = dynamic_malloc(0x20);
     ptr[2] = dynamic_malloc(0x380);
     ptr[3] = dynamic_malloc(0x400);
-        
-
+    
     dynamic_free(p);
     dynamic_free(ptr[0]);
     dynamic_free(ptr[1]);
     dynamic_free(ptr[2]);
     dynamic_free(ptr[3]);
     
-    dynamic_status();
     p = dynamic_malloc(0x10);
-    printf("%x\n", p); 
-    dynamic_status();
+    p = dynamic_malloc(0x400);
     return;
 }
