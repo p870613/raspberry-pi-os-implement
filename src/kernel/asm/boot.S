@@ -43,13 +43,13 @@ _from_el2_to_el1:
 
 _from_el1_to_el0:
     # set el0 stack pointer 
-    ldr x0, =_start
-    sub x0, x0, #0x1000
-    msr sp_el0, x0
+#    ldr x0, =_start
+#    sub x0, x0, #0x1000
+#    msr sp_el0, x0
     
     # set state to el1
-    mov x0, #0x3c0
-    msr  spsr_el1, x0
+#    mov x0, #0x3c0
+#    msr  spsr_el1, x0
 
     # disable exception fro, SIMD
     mrs x0, cpacr_el1
@@ -61,7 +61,7 @@ _from_el1_to_el0:
     # msr elr_el1, x0
  
     # enable interrupt
-    msr DAIFClr, 0xf
+#    msr DAIFClr, 0xf
     #bl core_timer_enable
     #eret
 
